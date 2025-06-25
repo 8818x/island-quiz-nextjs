@@ -26,9 +26,8 @@ jobs:
           --health-timeout 5s 
           --health-retries 5
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/island-quiz-db
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/island-quiz-db
 
-    
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
