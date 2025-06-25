@@ -20,10 +20,10 @@ jobs:
           POSTGRES_DB: island-quiz-db
         ports:
           - 5432:5432
-        options: 
-          --health-cmd pg_isready 
-          --health-interval 10s 
-          --health-timeout 5s 
+        options:
+          --health-cmd "pg_isready -U postgres -d island-quiz-db || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
           --health-retries 5
     env:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/island-quiz-db
@@ -40,15 +40,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Wait for PostgreSQL port
+      - name: Wait for PostgreSQL to be ready
         run: |
-          for i in {1..10}; do
-            nc -z postgres 5432 && echo "PostgreSQL port open" && exit 0
-            echo "[$i/10] Waiting for PostgreSQL..."
-            sleep 2
-          done
-          echo "PostgreSQL port not open after 10 tries"
-          exit 1
+          # Download wait-for-it.sh script
+          wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /usr/local/bin/wait-for-it.sh
+          chmod +x /usr/local/bin/wait-for-it.sh
+
+          echo "Waiting for PostgreSQL service at postgres:5432..."
+          # Execute wait-for-it.sh, waiting for up to 60 seconds for PostgreSQL to be accessible.
+          # The '--strict' flag ensures that the step fails if the service isn't available within the timeout.
+          /usr/local/bin/wait-for-it.sh postgres:5432 --timeout=60 --strict
+          echo "PostgreSQL is up and accessible!"
 
       - name: Generate Prisma Client
         run: npx prisma generate
