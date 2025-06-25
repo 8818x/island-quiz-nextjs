@@ -40,13 +40,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Wait for PostgreSQL to be ready
+      - name: Wait for PostgreSQL port (max 10 tries)
         run: |
-          until pg_isready -h postgres -p 5432; do
-            echo "Waiting for postgres..."
-            sleep 2
-          done
-          
+        for i in {1..10}; do
+          nc -z postgres 5432 && echo "PostgreSQL port open" && exit 0
+          echo "[$i/10] Waiting for PostgreSQL..."
+          sleep 2
+        done
+        echo "PostgreSQL port not open after 10 tries"
+        exit 1
+
       - name: Generate Prisma Client
         run: npx prisma generate
 

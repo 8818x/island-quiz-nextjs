@@ -1,5 +1,5 @@
 services:
-  db:
+  postgres:
     image: postgres:15
     container_name: island-quiz-postgres
     restart: always
@@ -22,7 +22,7 @@ services:
     ports:
       - 5050:80
     depends_on:
-      - db
+      - postgres
   
   app:
     build: .
@@ -31,9 +31,9 @@ services:
     ports:
       - 3000:3000
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/island-quiz-db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/island-quiz-db
     depends_on:
-      - db
+      - postgres
 
 volumes:
   island-quiz-db:
