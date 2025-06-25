@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: node:22-alpine
+
     services:
       postgres:
         image: postgres:15
@@ -18,13 +20,12 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: island-quiz-db
-        ports:
-          - 5432:5432
-        options:
-          --health-cmd "pg_isready -U postgres -d island-quiz-db || exit 1"
+        options: >-
+          --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     env:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/island-quiz-db
 
@@ -32,25 +33,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          # Download wait-for-it.sh script
-          wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /usr/local/bin/wait-for-it.sh
-          chmod +x /usr/local/bin/wait-for-it.sh
-
-          echo "Waiting for PostgreSQL service at postgres:5432..."
-          # Execute wait-for-it.sh, waiting for up to 60 seconds for PostgreSQL to be accessible.
-          # The '--strict' flag ensures that the step fails if the service isn't available within the timeout.
-          /usr/local/bin/wait-for-it.sh postgres:5432 --timeout=60 --strict
-          echo "PostgreSQL is up and accessible!"
+      - name: Install system deps for Prisma
+        run: apk add --no-cache openssl1.1-compat
 
       - name: Generate Prisma Client
         run: npx prisma generate
