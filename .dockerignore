@@ -1,0 +1,22 @@
+# Build artifacts
+.next
+out
+dist
+build
+
+# Dependency caches
+node_modules
+npm-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Environment and config
+.env
+.env.local
+.env.*.local
+
+# Editor and system files
+.vscode
+.idea
+.DS_Store
+Thumbs.db

@@ -12,16 +12,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container: node:22-alpine
+    options: --entrypoint /bin/sh 
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: island-quiz-db
         options: >-
-          --health-cmd pg_isready
+          --health-cmd pg_isready -U postgres
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -38,9 +39,9 @@ jobs:
 
       - name: Install system deps for Prisma on Alpine
         run: |
-          apk add --no-cache openssl
+          apk update && apk add --no-cache openssl
 
-      - name: Generate Prisma Client
+      - name: Generate Prisma client
         run: npx prisma generate
 
       - name: Push Prisma schema

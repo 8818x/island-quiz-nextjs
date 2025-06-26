@@ -1,8 +1,13 @@
 services:
   postgres:
-    image: postgres:15
+    image: postgres:17
     container_name: island-quiz-postgres
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -25,15 +30,26 @@ services:
       - postgres
   
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: island-quiz-nextjs
     restart: always
     ports:
-      - 3000:3000
+      - 3000:3000 # For Next.js
+      - 5555:5555 # For Prisma Studio
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/island-quiz-db
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
     depends_on:
       - postgres
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
 
 volumes:
   island-quiz-db:
