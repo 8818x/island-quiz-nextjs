@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Island Quiz - Next.js App
 
-## Getting Started
+A modern quiz platform built with Next.js, Prisma, PostgreSQL, and NextAuth.js.
 
-First, run the development server:
+Developed by Kanisorn Panichphol
+
+---
+## Installation
+
+### 1. Clone the repo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone --branch develop https://github.com/8818x/island-quiz-nextjs.git
+cd island-quiz-nextjs
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Copy example environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+```
+Edit your .env file and fill in NEXTAUTH_SECRET with a strong random value.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+You can quickly generate one using Node.js:
 
-## Learn More
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-To learn more about Next.js, take a look at the following resources:
+Copy the output and paste it as the value for NEXTAUTH_SECRET in your .env file:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+NEXTAUTH_SECRET=your_generate_string
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Install dependencies
 
-## Deploy on Vercel
+```bash
+npm ci
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 4. Run Docker services
+```bash
+docker compose up -d --build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 5. Access the services
+
+```bash
+Nextjs - localhost:3000
+pgAdmin - localhost:5050
+```
+
+### 6. Prisma Studio (Optional)
+
+```bash
+docker compose exec app npx prisma studio
+```
+
+### 7. If Docker didn't implement Prisma
+
+```bash
+docker compose exec app npx prisma db push
+docker compose exec app npx prisma generate
+```
+
+### 8. Stop Docker services
+```bash
+docker compose down -v
+```
