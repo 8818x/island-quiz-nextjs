@@ -16,7 +16,7 @@ function SubmitButton() {
 		<button
 			type="submit"
 			disabled={pending}
-			className={`w-full py-2 px-4 rounded font-semibold text-white transition duration-300 ease-in-out
+			className={`w-full py-2 px-4 cursor-pointer rounded font-semibold text-white transition duration-300 ease-in-out
       ${
 				pending
 					? "bg-blue-400 cursor-not-allowed"
@@ -117,7 +117,7 @@ export default function RegisterPage() {
 						/>
 						<button
 							type="button"
-							className="absolute top-1/2 right-0 pr-3 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+							className="absolute top-1/2 right-0 pr-3 -translate-y-1/2 text-gray-500 hover:text-gray-700 cursor-pointer"
 							onClick={() => setShowPassword(!showPassword)}
 							aria-label="Toggle password visibility"
 						>
@@ -144,7 +144,7 @@ export default function RegisterPage() {
 						/>
 						<button
 							type="button"
-							className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+							className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 hover:text-gray-700 cursor-pointer"
 							onClick={() => setShowConfirmPassword(!showConfirmPassword)}
 							aria-label="Toggle confirm password visibility"
 						>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 
@@ -27,6 +27,9 @@ export default function QuizPage() {
 
 	const router = useRouter();
 
+	const [elapsed, setElapsed] = useState(0);
+	const startTimeRef = useRef<number | null>(null);
+
 	const fetchQuestion = useCallback(async () => {
 		if (!sessionId) {
 			toast.error("Session not found. Redirecting to home...");
@@ -39,10 +42,11 @@ export default function QuizPage() {
 		try {
 			const res = await fetch(`/api/quiz/questions?sessionId=${sessionId}`);
 			if (!res.ok) throw new Error();
+
 			const data = await res.json();
 
-			if (!data) {
-				router.push("/quiz/summary");
+			if (!data?.questionId) {
+				router.push(`/summary/${sessionId}`);
 				return;
 			}
 
@@ -55,13 +59,48 @@ export default function QuizPage() {
 		}
 	}, [sessionId, router]);
 
+	const initialFetchRef = useRef(false);
 	useEffect(() => {
-		fetchQuestion();
+		if (!initialFetchRef.current) {
+			initialFetchRef.current = true;
+			fetchQuestion();
+		}
 	}, [fetchQuestion]);
+
+	useEffect(() => {
+		if (!question || !sessionId) return;
+
+		const startKey = `quiz_start_${sessionId}_${question.questionId}`;
+		const saved = localStorage.getItem(startKey);
+
+		let now: number;
+		if (saved) now = Number(saved);
+		else {
+			now = Date.now();
+			localStorage.setItem(startKey, String(now));
+		}
+		startTimeRef.current = now;
+
+		setElapsed(0);
+
+		const interval = setInterval(() => {
+			if (startTimeRef.current) {
+				setElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000));
+			}
+		}, 500);
+
+		return () => clearInterval(interval);
+	}, [question, sessionId]);
 
 	async function handleAnswer(choiceId: string) {
 		if (!question) return;
 		setSubmitting(true);
+
+		const startKey = `quiz_start_${sessionId}_${question.questionId}`;
+		const timeSpent = startTimeRef.current
+			? Math.floor((Date.now() - startTimeRef.current) / 1000)
+			: 0;
+
 		try {
 			const res = await fetch("/api/quiz/answer", {
 				method: "POST",
@@ -70,9 +109,10 @@ export default function QuizPage() {
 					sessionId,
 					questionId: question.questionId,
 					choiceId,
-					timeSpent: 0
+					timeSpent
 				})
 			});
+			localStorage.removeItem(startKey);
 			if (!res.ok) throw new Error();
 			const { isCorrect } = await res.json();
 			setIsCorrectResult(isCorrect);
@@ -95,8 +135,8 @@ export default function QuizPage() {
 	};
 	if (loading) {
 		return (
-			<div className="min-h-screen flex items-center justify-center bg-white">
-				<div className="w-12 h-12 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+			<div className="h-[75dvh] flex items-center justify-center bg-white">
+				<div className="w-12 h-12 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
 				<span className="ml-3">Loading...</span>
 			</div>
 		);
@@ -104,27 +144,29 @@ export default function QuizPage() {
 
 	if (!question) {
 		return (
-			<div className="min-h-screen flex items-center justify-center bg-white">
+			<div className="h-[75dvh] flex items-center justify-center bg-white">
 				<div className="p-10 text-red-600">Question not found</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="flex flex-col items-start justify-start min-h-screen p-10 bg-gray-50">
-			<h1 className="text-xl font-bold mb-10">QUIZ ISLAND</h1>
+		<div className="relative flex flex-col items-start justify-start h-[75dvh] p-10">
+			<div className="absolute right-8 top-3 px-4">
+				<h3>Time: {elapsed}s</h3>
+			</div>
 			<div className="flex flex-col items-center justify-center flex-1 w-full">
 				{loading || !question ? (
 					<div className="text-gray-500">Loading...</div>
 				) : (
-					<div className="w-full max-w-md p-6 rounded-lg">
+					<div className="w-full max-w-md p-6">
 						<p className="mb-4 font-medium">{question.title}</p>
 						<ul className="flex flex-col gap-3">
 							{question.choices.map((c) => (
 								<li
 									key={c.choiceId}
 									onClick={() => !submitting && handleAnswer(c.choiceId)}
-									className="border px-4 py-2 rounded hover:bg-gray-100 cursor-pointer text-center"
+									className="border px-4 py-2 hover:bg-gray-100 cursor-pointer text-center"
 								>
 									{c.title}
 								</li>
@@ -134,10 +176,9 @@ export default function QuizPage() {
 				)}
 			</div>
 
-			{/* Modal */}
 			{showModal && (
 				<div className="fixed inset-0 bg-black/10 flex items-center justify-center">
-					<div className="bg-white p-6 rounded-lg shadow-lg text-center w-80">
+					<div className="bg-white p-6 shadow-lg text-center w-80">
 						<p className="mb-2 text-sm uppercase text-gray-500">
 							Your Answer is
 						</p>
@@ -151,7 +192,7 @@ export default function QuizPage() {
 						<button
 							onClick={handleNext}
 							disabled={nextLoading}
-							className="w-full px-4 py-2 border border-black text-black rounded hover:bg-gray-100 disabled:opacity-50"
+							className="w-full px-4 py-2 cursor-pointer border border-black text-black hover:bg-gray-100 disabled:opacity-50 transition duration-300 ease-in-out"
 						>
 							{nextLoading ? "Loading..." : "NEXT"}
 						</button>

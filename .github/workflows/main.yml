@@ -3,10 +3,10 @@ name: CI for island-quiz-nextjs
 on:
   push:
     branches:
-      - main
+      - develop
   pull_request:
     branches:
-      - main
+      - develop
 
 jobs:
   build:
@@ -41,11 +41,11 @@ jobs:
         run: |
           apk update && apk add --no-cache openssl
 
-      - name: Generate Prisma client
-        run: npx prisma generate
-
       - name: Push Prisma schema
         run: npx prisma db push
+
+      - name: Generate Prisma client
+        run: npx prisma generate
 
       - name: Build Next.js app
         run: npm run build

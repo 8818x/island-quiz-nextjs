@@ -2,6 +2,8 @@ import { type NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from './prisma';
 import bcrypt from 'bcrypt';
+import { getToken } from 'next-auth/jwt';
+import { NextRequest } from 'next/server';
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -61,3 +63,9 @@ export const authOptions: NextAuthOptions = {
     },
     secret: process.env.NEXTAUTH_SECRET,
 };
+
+
+export async function getCurrentUser(req: NextRequest) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    return token?.user?.id as string | undefined;
+}

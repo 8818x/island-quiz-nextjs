@@ -30,24 +30,21 @@ export default function Home() {
 		router.push(`/quiz/${data.sessionId}`);
 	}
 	return (
-		<div className="flex flex-col items-start justify-start min-h-screen p-10">
-			<h1 className="text-xl font-bold mb-10">QUIZ ISLAND</h1>
-			<div className="flex flex-col items-center justify-center flex-1 w-full">
-				<button
-					className="border px-12 py-3 w-48 cursor-pointer"
-					disabled={loading}
-					onClick={handleStart}
-				>
-					{loading ? (
-						<div className="flex items-center justify-center gap-2">
-							<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-							STARTING...
-						</div>
-					) : (
-						"START"
-					)}
-				</button>
-			</div>
+		<div className="h-[75dvh] overflow-hidden flex flex-col items-center justify-center">
+			<button
+				className="border px-12 py-3 w-48 cursor-pointer transition duration-300 ease-in-out hover:bg-gray-100 disabled:opacity-50"
+				disabled={loading}
+				onClick={handleStart}
+			>
+				{loading ? (
+					<div className="flex items-center justify-center gap-2">
+						<div className="w-5 h-5 border-2 border-white border-transparent rounded-full animate-spin" />
+						STARTING...
+					</div>
+				) : (
+					"START"
+				)}
+			</button>
 		</div>
 	);
 }
