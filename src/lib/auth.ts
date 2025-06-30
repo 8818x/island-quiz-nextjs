@@ -28,13 +28,14 @@ export const authOptions: NextAuthOptions = {
                     id: user.id,
                     email: user.email,
                     username: user.username,
-                    display_name: user.displayname,
+                    displayname: user.displayname,
                 };
             },
         }),
     ],
     session: {
         strategy: 'jwt',
+        maxAge: 7 * 24 * 60 * 60,
     },
     pages: {
         signIn: '/login',
@@ -48,7 +49,12 @@ export const authOptions: NextAuthOptions = {
         },
         async session({ session, token }) {
             if (token?.user) {
-                session.user = token.user;
+                session.user = token.user as {
+                    id: string,
+                    email: string,
+                    username: string,
+                    displayname: string
+                };
             }
             return session;
         },

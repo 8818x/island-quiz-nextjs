@@ -22,4 +22,24 @@ model User {
   displayname String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Game Session
+  currentSessionId String?
+  completedSessions CompletedSession[]
 }
+
+
+model CompletedSession {
+  id String @id @default(uuid())
+  sessionId String @unique
+  submittedQuestions Int?
+  score Int?
+  timeSpent Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationship
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+}
+

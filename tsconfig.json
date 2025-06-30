@@ -23,6 +23,7 @@
       }
     ],
     "paths": {
+      "@/components/*": ["./src/components/*"],
       "@/generated/*": ["./generated/*"],
       "@/lib/*": ["./src/lib/*"],
       "@/*": ["./src/*"]
