@@ -1,17 +1,12 @@
-import type { Metadata } from "next";
 import ClientQuiz from "./ClientQuiz";
 
-export async function generateMetadata({
-	params
-}: {
-	params: { sessionId: string };
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { sessionId: string } }) {
 	return {
-		title: `Island Quiz - Session ${params.sessionId}`,
+		title: `Quiz - Session ${params.sessionId}`,
 		description: "Island Quiz"
 	};
 }
 
-export default function SummaryPage() {
+export default function QuizPage() {
 	return <ClientQuiz />;
 }
