@@ -4,9 +4,13 @@ on:
   push:
     branches:
       - develop
+      - production
+      - main
   pull_request:
     branches:
       - develop
+      - production
+      - main
 
 jobs:
   build:
@@ -40,8 +44,13 @@ jobs:
         run: |
           apk update && apk add --no-cache openssl
 
-      - name: Push Prisma schema
+      - name: Push Prisma schema (dev)
+        if: github.ref == 'refs/heads/develop'
         run: npx prisma db push
+
+      - name: Apply migrations (prod/main)
+        if: github.ref == 'refs/heads/production' || github.ref == 'refs/heads/main'
+        run: npx prisma migrate deploy
 
       - name: Generate Prisma client
         run: npx prisma generate
