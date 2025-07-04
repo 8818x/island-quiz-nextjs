@@ -3,18 +3,20 @@ import ClientSummary from "./ClientSummary";
 export async function generateMetadata({
 	params
 }: {
-	params: { sessionId: string };
+	params: Promise<{ sessionId: string }>;
 }) {
+	const { sessionId } = await params;
 	return {
-		title: `Quiz Summary - Session ${params.sessionId}`,
+		title: `Quiz Summary - Session ${sessionId}`,
 		description: "Summary of your quiz session"
 	};
 }
 
-export default function SummaryPage({
+export default async function SummaryPage({
 	params
 }: {
-	params: { sessionId: string };
+	params: Promise<{ sessionId: string }>;
 }) {
-	return <ClientSummary sessionId={params.sessionId} />;
+	const { sessionId } = await params;
+	return <ClientSummary sessionId={sessionId} />;
 }
