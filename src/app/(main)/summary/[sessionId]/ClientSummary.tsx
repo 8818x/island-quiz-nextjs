@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
@@ -13,8 +12,7 @@ type Summary = {
 	timeSpent: number;
 };
 
-export default function ClientSummary() {
-	const { sessionId } = useParams() as { sessionId: string };
+export default function ClientSummary({ sessionId }: { sessionId: string }) {
 	const [summary, setSummary] = useState<Summary | null>(null);
 
 	const router = useRouter();

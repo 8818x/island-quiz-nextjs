@@ -7,6 +7,6 @@ export async function generateMetadata({ params }: { params: { sessionId: string
 	};
 }
 
-export default function QuizPage() {
-	return <ClientQuiz />;
+export default function QuizPage({ params }: { params: { sessionId: string } }) {
+	return <ClientQuiz sessionId={params.sessionId} />;
 }

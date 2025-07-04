@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 interface Choice {
@@ -15,8 +15,7 @@ interface Question {
 	choices: Choice[];
 }
 
-export default function ClientQuiz() {
-	const { sessionId } = useParams() as { sessionId: string };
+export default function ClientQuiz({ sessionId }: { sessionId: string }) {
 	const [question, setQuestion] = useState<Question | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [submitting, setSubmitting] = useState(false);
