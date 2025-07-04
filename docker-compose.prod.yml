@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: island-quiz-postgres
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    volumes:
+      - island-quiz-db:/var/lib/postgresql/data
+  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deploy
+    image: island-quiz-nextjs:latest
+    container_name: island-quiz-nextjs
+    restart: unless-stopped
+    ports:
+      - 3000:3000 # For Next.js
+    env_file:
+      - .env.production
+    depends_on:
+      - postgres
+
+volumes:
+  island-quiz-db:
