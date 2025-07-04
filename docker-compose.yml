@@ -9,41 +9,27 @@ services:
       timeout: 5s
       retries: 5
     env_file:
-      - .env.development
+      - .env.production
     ports:
       - 5432:5432
     volumes:
       - island-quiz-db:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: island-quiz-pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - 5050:80
-    depends_on:
-      - postgres
-  
   app:
     build:
       context: .
       dockerfile: Dockerfile
+      target: release
+    image: island-quiz-nextjs:latest
     container_name: island-quiz-nextjs
     restart: always
     ports:
       - 3000:3000 # For Next.js
-      - 5555:5555 # For Prisma Studio
     env_file:
-      - .env.development
+      - .env.production
     depends_on:
       - postgres
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.next
+    command: ["./entrypoint.sh"]
 
 volumes:
   island-quiz-db:
